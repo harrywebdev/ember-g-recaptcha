@@ -20,7 +20,7 @@ export default Component.extend({
   tabindex: alias('tabIndex'),
 
   renderReCaptcha() {
-    let properties = this.getProperties('sitekey', 'theme', 'type', 'size', 'tabindex', 'hl');
+    let properties = this.getProperties('sitekey', 'theme', 'type', 'size', 'tabindex', 'hl', "action");
     let parameters = assign(properties, {
       callback: this.get('successCallback').bind(this),
       'expired-callback': this.get('expiredCallback').bind(this),
