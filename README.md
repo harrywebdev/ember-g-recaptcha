@@ -24,6 +24,7 @@ Then, you need to set your Site Key in the `ENV` var on your `config/environment
     gReCaptcha: {
       jsUrl: 'https://www.google.com/recaptcha/api.js?render=explicit', // default
       siteKey: 'your-recaptcha-site-key'
+      enterprise: true, // uses Enterprise API
     }
 
     // ...

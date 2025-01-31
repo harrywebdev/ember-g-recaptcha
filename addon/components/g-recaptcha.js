@@ -4,8 +4,15 @@ import { isPresent } from '@ember/utils';
 import { assign } from '@ember/polyfills';
 import Configuration from '../configuration';
 
-export default Component.extend({
+function getSdk() {
+  if (Configuration.enterprise) {
+    return window.grecaptcha.enterprise;
+  }
 
+  return window.grecaptcha;
+}
+
+export default Component.extend({
   classNames: ['g-recaptcha'],
 
   sitekey: Configuration.siteKey,
@@ -13,27 +20,20 @@ export default Component.extend({
   tabindex: alias('tabIndex'),
 
   renderReCaptcha() {
-    let properties = this.getProperties(
-      'sitekey',
-      'theme',
-      'type',
-      'size',
-      'tabindex',
-      'hl'
-    );
+    let properties = this.getProperties('sitekey', 'theme', 'type', 'size', 'tabindex', 'hl');
     let parameters = assign(properties, {
       callback: this.get('successCallback').bind(this),
       'expired-callback': this.get('expiredCallback').bind(this),
     });
-    let widgetId = window.grecaptcha.render(this.get('element'), parameters);
+    let widgetId = getSdk().render(this.get('element'), parameters);
     this.set('widgetId', widgetId);
     this.set('ref', this);
-    this.renderCallback()
+    this.renderCallback();
   },
 
   resetReCaptcha() {
     if (isPresent(this.get('widgetId'))) {
-      window.grecaptcha.reset(this.get('widgetId'));
+      getSdk().reset(this.get('widgetId'));
     }
   },
 
@@ -70,9 +70,10 @@ export default Component.extend({
 
   didInsertElement() {
     this._super(...arguments);
-    window.__ember_g_recaptcha_onload_callback = () => { this.renderReCaptcha(); };
+    window.__ember_g_recaptcha_onload_callback = () => {
+      this.renderReCaptcha();
+    };
     let baseUrl = Configuration.jsUrl || 'https://www.google.com/recaptcha/api.js?render=explicit';
-    this.appendScript(`${baseUrl}&onload=__ember_g_recaptcha_onload_callback`)
-  }
-
+    this.appendScript(`${baseUrl}&onload=__ember_g_recaptcha_onload_callback`);
+  },
 });
